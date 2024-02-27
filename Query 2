@@ -1,0 +1,26 @@
+Q1. Write a query to find the start date and the final date for each state
+
+Data:
+create table tasks (
+date_value date,
+state varchar(10)
+);
+
+insert into tasks  values ('2019-01-01','success'),('2019-01-02','success'),('2019-01-03','success'),('2019-01-04','fail')
+,('2019-01-05','fail'),('2019-01-06','success')
+
+Query : 
+with result as
+(select state,date_value,row_number() over (partition by state order by date_value) rn,
+DATEADD(day,-1*row_number() over (partition by state order by date_value),date_value) added
+from tasks)
+select state,min(date_value) as  start_date, max(date_value) as Full_date 
+from Result
+group by added,state
+order by start_date
+
+Query Result:
+State             Start Data            Full_date
+success	          2019-01-01          	2019-01-03
+fail	            2019-01-04          	2019-01-05
+success          	2019-01-06          	2019-01-06
