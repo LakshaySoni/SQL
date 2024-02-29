@@ -1,0 +1,30 @@
+Q.1: Find Out the Total Sales from the start of period till the end of the year for aech Proudt_id.
+(Note the Average_daily_sale is the sale of a single day)
+
+Data :
+create table sales (
+product_id int,
+period_start date,
+period_end date,
+average_daily_sales int
+);
+
+insert into sales values(1,'2019-01-25','2019-02-28',100),(2,'2018-12-01','2020-01-01',10),(3,'2019-12-01','2020-01-31',1);
+
+select * from sales
+ 
+Query :
+
+with result as(
+select min(period_start) as t_days, max(period_end) as max_date from sales 
+Union all
+select dateadd(DAY,1,t_days) as t_days ,max_date from result
+where t_days<=max_date
+) ,star as(
+select * from result
+inner join sales on t_days between period_start and period_end
+)
+select product_id, year(t_days) as t_year , sum(average_daily_sales) as total_S from star
+group by product_id,year(t_days)
+order by product_id,year(t_days)
+option (maxrecursion 20000)
